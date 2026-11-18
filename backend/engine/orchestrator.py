@@ -5,6 +5,8 @@ through the conflict detector, groups accepted facts by area, and hands
 each area to its specialist agent for pure-Python calculation.
 """
 
+import math
+
 from agents import budget_agent, food_agent, judging_agent, schedule_agent, venue_agent
 from agents.reading_agent import extract_facts
 from engine import conflict_detector, validation_engine
@@ -28,12 +30,35 @@ def run_plan(
         per_message_facts.append((msg, extraction.get("facts", [])))
 
     judges_confirmed = 0
+    detected_headcount = None
+    detected_team_size = None
+    detected_staff = None
+    detected_budget_ceiling = None
     for _, facts in per_message_facts:
         for fact in facts:
-            if fact.get("area") == "judging":
-                value = (fact.get("attributes") or {}).get("judges_confirmed")
-                if value:
-                    judges_confirmed = max(judges_confirmed, int(value))
+            attrs = fact.get("attributes") or {}
+            area = fact.get("area")
+            if area == "judging" and attrs.get("judges_confirmed"):
+                judges_confirmed = max(judges_confirmed, int(attrs["judges_confirmed"]))
+            if area == "schedule":
+                if attrs.get("headcount"):
+                    detected_headcount = int(attrs["headcount"])
+                if attrs.get("team_size"):
+                    detected_team_size = int(attrs["team_size"])
+            if area == "budget":
+                if attrs.get("staff_on_duty"):
+                    detected_staff = int(attrs["staff_on_duty"])
+                if attrs.get("budget_all_in") is True and fact.get("cost") is not None:
+                    detected_budget_ceiling = float(fact["cost"])
+
+    # The event's actual headcount/staff/budget come from the messages
+    # themselves whenever stated - the passed-in values are only a
+    # fallback for when a message pack doesn't restate them.
+    student_count = detected_headcount or student_count
+    staff_count = detected_staff or staff_count
+    approved_budget = detected_budget_ceiling or approved_budget
+    if detected_headcount and detected_team_size:
+        team_count = math.ceil(detected_headcount / detected_team_size)
 
     required_capacity = student_count + staff_count + judges_confirmed
 

@@ -37,22 +37,37 @@ not a request, as long as the sender states it rather than asking for it.
 The "attributes" object holds extra named values when they apply to this
 fact's area. You MUST use these exact key names verbatim - never rename,
 abbreviate, or invent a synonym for them:
-- venue: venue_name, capacity, has_generator (always include venue_name
-  whenever a specific venue is named, even in a price update or correction
-  that doesn't re-describe the whole venue)
-- food: package_name, price_per_person, delivery_free, headcount (always
-  include package_name whenever a specific food package is named, even in
-  a price update or correction that doesn't re-describe the whole package)
+- venue: venue_name, capacity, has_generator, has_ramp_access (true/false,
+  only when step-free/ramp/ground-floor access is explicitly mentioned for
+  that venue), is_unavailable (set true ONLY when a message says a
+  previously offered venue can no longer be booked, is withdrawn, under
+  maintenance, double-booked, etc. - omit entirely otherwise),
+  requires_accessibility (set true on its own fact, not tied to a specific
+  venue, when a message states that step-free/wheelchair access is a
+  requirement for the event). Always include venue_name whenever a
+  specific venue is named, even in a price update, correction, or
+  withdrawal that doesn't re-describe the whole venue.
+- food: package_name, price_per_person, delivery_free, headcount,
+  service_charge_percent (always include package_name whenever a specific
+  food package is named, even in a price update that doesn't re-describe
+  the whole package)
 - judging: judges_confirmed, honorarium_per_judge, minutes_per_team,
   max_teams_per_judge, late_minutes
 - budget: category, budget_all_in (boolean true/false only - set it to
   true ONLY on the single fact that states the event's overall approved
   budget ceiling, e.g. "the budget is Rs X, all in" - never on an
-  individual expense line item, even one that is itself "all inclusive")
-- schedule: prayer_break_minutes, duration_minutes, start_time, end_time
+  individual expense line item, even one that is itself "all inclusive"),
+  staff_on_duty
+- schedule: prayer_break_minutes, duration_minutes, start_time, end_time,
+  headcount, team_size
 
 Omit a key entirely (do not include it with null) when the message doesn't
-mention it. Only extract what is actually stated - do not invent values."""
+mention it. Only extract what is actually stated - do not invent values.
+
+If a message has no relevant planning content at all (pure noise, totally
+unrelated to venue/schedule/food/judging/budget - for example an unrelated
+building's hours), return an empty "facts" array rather than forcing it
+into one of the five areas."""
 
 
 def extract_facts(model: ModelService, message_text: str, sender: str) -> dict:

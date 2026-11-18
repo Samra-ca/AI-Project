@@ -12,6 +12,7 @@ class FoodPackage:
     name: str
     price_per_person: float
     delivery_charge: float
+    service_charge_percent: float = 0.0
 
 
 @dataclass
@@ -35,6 +36,7 @@ def _to_package(fact: dict) -> FoodPackage | None:
         name=attrs.get("package_name") or fact.get("fact", "Unnamed package"),
         price_per_person=float(price),
         delivery_charge=delivery_charge,
+        service_charge_percent=float(attrs.get("service_charge_percent") or 0.0),
     )
 
 
@@ -42,12 +44,23 @@ def _latest_per_package(food_facts: list[dict]) -> list[FoodPackage]:
     """Facts are appended in chronological message order, so a later quote
     for the same package name (e.g. a price update) replaces an earlier one
     instead of both being treated as separate options - a stale quote must
-    not win just because it happens to be cheaper."""
+    not win just because it happens to be cheaper. A service charge stated
+    in the same message as the prices (not tied to one specific package
+    name) is carried forward onto every package from that point on, since
+    it's a caterer-wide surcharge rather than a per-package attribute.
+    """
     by_name: dict[str, FoodPackage] = {}
+    pending_service_charge = 0.0
     for fact in food_facts:
+        attrs = fact.get("attributes") or {}
+        if attrs.get("service_charge_percent"):
+            pending_service_charge = float(attrs["service_charge_percent"])
+
         package = _to_package(fact)
         if package is None:
             continue
+        if not package.service_charge_percent:
+            package.service_charge_percent = pending_service_charge
         by_name[package.name.lower().strip()] = package
     return list(by_name.values())
 
@@ -66,7 +79,8 @@ def select_food_package(food_facts: list[dict], headcount: int) -> FoodDecision:
 
     packages.sort(key=lambda p: p.price_per_person)
     selected = packages[0]
-    total_cost = selected.price_per_person * headcount + selected.delivery_charge
+    subtotal = selected.price_per_person * headcount + selected.delivery_charge
+    total_cost = subtotal * (1 + selected.service_charge_percent / 100)
 
     rejected = [
         (p, "More expensive per head; cheapest sufficient package preferred.")
@@ -77,8 +91,11 @@ def select_food_package(food_facts: list[dict], headcount: int) -> FoodDecision:
     reason = (
         f"{selected.name} at Rs. {selected.price_per_person:,.0f}/head is the "
         f"cheapest available package for {headcount} people, preserving budget "
-        f"(total Rs. {total_cost:,.0f})."
+        f"(total Rs. {total_cost:,.0f}"
     )
+    if selected.service_charge_percent:
+        reason += f", including a {selected.service_charge_percent:g}% service charge"
+    reason += ")."
 
     return FoodDecision(
         selected=selected,

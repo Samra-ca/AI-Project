@@ -9,6 +9,14 @@ _BLOCK_PATTERN = re.compile(
     re.IGNORECASE | re.DOTALL,
 )
 
+# Alternate format seen in some packs: "#1 | From: X | Date: Y" followed by
+# the quoted message text on the next line(s).
+_NUMBERED_PATTERN = re.compile(
+    r"#\d+\s*\|\s*From:\s*(?P<sender>.+?)\s*\|\s*Date:\s*(?P<date>.+?)\s*\n"
+    r'\s*"(?P<message>.+?)"',
+    re.IGNORECASE | re.DOTALL,
+)
+
 
 @dataclass
 class RawMessage:
@@ -24,15 +32,9 @@ def _fingerprint(sender: str, date: str, text: str) -> str:
     return hashlib.sha256(key.encode("utf-8")).hexdigest()
 
 
-def parse_messages(file_text: str) -> list[RawMessage]:
-    """Parses a .txt message pack into individual messages, preserving each
-    message's original text exactly as provided. Tolerant to blank-line
-    separated blocks with "Sender:", "Date:", and "Message:" labels
-    (case-insensitive), since the judging pack's exact formatting is
-    unseen.
-    """
+def _extract(pattern: re.Pattern, file_text: str) -> list[RawMessage]:
     messages: list[RawMessage] = []
-    for match in _BLOCK_PATTERN.finditer(file_text):
+    for match in pattern.finditer(file_text):
         sender = match.group("sender").strip()
         date = match.group("date").strip()
         text = match.group("message").strip()
@@ -46,6 +48,21 @@ def parse_messages(file_text: str) -> list[RawMessage]:
             )
         )
     return messages
+
+
+def parse_messages(file_text: str) -> list[RawMessage]:
+    """Parses a .txt message pack into individual messages, preserving each
+    message's original text exactly as provided. The judging pack's exact
+    formatting is unseen, so this tries each known format in turn and uses
+    whichever one actually matches:
+    - blank-line separated "Sender:"/"Date:"/"Message:" blocks
+    - "#1 | From: X | Date: Y" followed by a quoted message
+    """
+    for pattern in (_BLOCK_PATTERN, _NUMBERED_PATTERN):
+        messages = _extract(pattern, file_text)
+        if messages:
+            return messages
+    return []
 
 
 def read_message_file(path: str) -> list[RawMessage]:
