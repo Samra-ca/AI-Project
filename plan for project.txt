@@ -1,0 +1,1005 @@
+# **Complete Hackathon Project Plan — Mind to Machine Hackathon**
+
+I've carefully reviewed all **4 pages** of your uploaded *Mind to Machine Hackathon – Student Brief (18 November 2026)*.
+
+My recommendation is to build a **Smart AI-Powered Hackathon Planning Agent** with a professional web dashboard, an AI-powered message understanding system, automatic constraint validation, budget calculations, and an explainable decision trace.
+
+We will use **PostgreSQL as the only database** if we implement a backend. We will not use MongoDB, Firebase, SQLite, or any other database.
+
+The most important thing: this should not be just a chatbot that reads messages. It must be an agent system that reads messages, understands changing requirements, makes decisions, rejects incorrect information, and updates the existing event plan.
+
+## **1. Project objectives and requirements**
+
+According to page 1 of the brief, the system must:
+
+1. Read every message from a text file exactly as provided.
+2. Process every message using the same command, without manual flags or hints.
+3. Record every AI model call with its model name, area, input, output, and actual token counts.
+4. Accept additional messages after the initial run and update the existing plan.
+5. Detect conflicts and invalid messages, preserve valid constraints, and explain rejection reasons.
+6. Provide a UI showing the plan, trace, and rejected messages.
+
+The event is for:
+
+| Requirement         | Value       |
+| ------------------- | ----------- |
+| Location            | Islamabad   |
+| Students            | 150         |
+| Teams               | 50          |
+| Team size           | 3           |
+| Event duration      | 4 hours     |
+| Budget              | Rs. 650,000 |
+| Staff               | 10          |
+| Main planning areas | 5           |
+
+The five areas are venue, schedule, food, judging, and budget. These are mandatory, not optional.&#x20;
+
+Hackathon_Students_Brief_Final.pdf
+
+
+
+## **2. Recommended technology stack**
+
+**Frontend — React.js**
+
+Required
+
+- React + Vite
+- TypeScript
+- Tailwind CSS
+- Recharts for budget and statistics
+- Lucide icons
+
+  **Backend — Python FastAPI**
+
+  Recommended
+- FastAPI
+- Pydantic for structured validation
+- SQLAlchemy ORM
+- Alembic for database migrations
+
+  **Database — PostgreSQL**
+
+  Only database
+- PostgreSQL
+- Store messages, constraints, decisions, plans, and traces
+
+  **AI / Agent layer**
+- A small language model for understanding messages
+- Structured JSON output
+- Agent orchestration using Python
+- Rule-based validation engine
+- Incremental update engine
+
+  **Input and output**
+- Plain `.txt` message files
+- JSON plan output
+- JSON or CSV trace export
+- Final report export
+
+**Important:** The AI model should understand language and extract facts. Python should handle calculations, budget totals, capacity, scheduling, and validation. This is more reliable and uses fewer tokens.
+
+## **3. System architecture**
+
+The complete system should work through this pipeline:
+
+**Message Input**
+
+Emails, WhatsApp messages, notices (.txt)
+
+**Message Reading Agent**
+
+English + Roman Urdu understanding
+
+**Information Extraction Agent**
+
+Facts, quantities, dates, costs, constraints, source and confidence
+
+**Constraint & Conflict Engine**
+
+Check authority, dates, contradictions and feasibility
+
+**Planning Agents**
+
+Venue · Schedule · Food · Judging · Budget
+
+**Rule Engine**
+
+Capacity · Arithmetic · Timings · Budget
+
+**PostgreSQL**
+
+Messages, decisions, constraints, plans, model traces and versions
+
+**React Dashboard**
+
+Final plan · Trace · Rejections · Budget · Updates
+
+### **How the agents should work**
+
+I recommend one orchestrator with five specialist planning modules, not five independent AI agents making uncontrolled decisions.
+
+| Agent/module      | Responsibility                                     |
+| ----------------- | -------------------------------------------------- |
+| Reading Agent     | Read and understand each message                   |
+| Venue Planner     | Find a suitable venue                              |
+| Schedule Planner  | Build a valid timetable                            |
+| Food Planner      | Calculate food quantities and costs                |
+| Judging Planner   | Calculate judge requirements and assignments       |
+| Budget Planner    | Calculate all expenses and remaining budget        |
+| Validation Engine | Check all constraints and reject invalid decisions |
+
+The five planning modules can use Python calculations wherever possible. They should only make model calls when language understanding or reasoning is necessary.
+
+This follows the brief's instruction that the number of agents itself earns no points.&#x20;
+
+Hackathon_Students_Brief_Final.pdf
+
+
+
+## **4. Complete dashboard design**
+
+I recommend a professional dark navy dashboard with blue gradient accents, glass-style cards, clean tables, and responsive layouts.
+
+**Mind2Machine AI**
+
+Intelligent Event Planning System
+
+System Ready
+
+Students
+
+# **150**
+
+Teams
+
+# **50**
+
+Budget
+
+# **650K**
+
+PKR
+
+Judges
+
+# **20**
+
+**Dashboard navigation**
+
+Overview
+
+Message Center
+
+Venue Planning
+
+Schedule
+
+Food Planning
+
+Judging
+
+Budget Management
+
+AI Agent Trace
+
+Validation & Rejections
+
+Plan Versions
+
+**Example budget status**
+
+Within budget
+
+Illustrative utilization: Rs. 524,000 / Rs. 650,000
+
+### **Page-by-page functionality**
+
+**Page 1 — Overview Dashboard**
+
+- Total students and teams.
+- Number of staff and judges.
+- Total approved budget.
+- Current estimated expenditure.
+- Remaining budget.
+- Number of processed messages.
+- Number of accepted and rejected messages.
+- Overall planning status.
+
+**Page 2 — Message Center**
+
+- Upload a `.txt` file.
+- Display all messages.
+- Show sender, date, message content and processing status.
+- Show extracted facts.
+- Show whether the message is accepted, partially accepted, rejected or pending.
+- Add new messages individually.
+- Preserve the original message text.
+
+**Page 3 — Venue Planning**
+
+- Available venues.
+- Venue capacities.
+- Venue prices.
+- Generator availability.
+- Selected venue.
+- Reason for selection.
+- Rejected venue options and explanations.
+
+**Page 4 — Schedule Planning**
+
+- Complete event timetable.
+- Start and end times.
+- Prayer break.
+- Code freeze.
+- Test run.
+- Judging period.
+- Conflict warnings.
+
+**Page 5 — Food Planning**
+
+- Total people requiring food.
+- Food package selection.
+- Price per person.
+- Required quantity.
+- Delivery charges.
+- Total food expenditure.
+- Insufficient food quantity warnings.
+
+**Page 6 — Judging Management**
+
+- Total teams.
+- Total judges.
+- Teams per judge.
+- Minutes per team.
+- Judge assignments.
+- Late-arrival handling.
+- Unassigned team warnings.
+
+**Page 7 — Budget Management**
+
+- Approved budget.
+- Pre-ordered expenses.
+- Venue expense.
+- Food expense.
+- Judge honorarium.
+- Optional expenses.
+- Total expenditure.
+- Remaining balance.
+- Budget validation.
+
+**Page 8 — AI Agent Trace**
+
+This is particularly important because the judging brief explicitly requires a printed trace.
+
+Display:
+
+- Call number.
+- Model name.
+- Area tag.
+- Input sent to the model.
+- Actual model response.
+- Input token count.
+- Output token count.
+- Total tokens.
+- Execution duration.
+- Reason for the model call.
+
+**Page 9 — Validation and Rejections**
+
+Display every invalid or conflicting message with:
+
+- Original message.
+- Conflict type.
+- Relevant existing rule.
+- Reason for rejection.
+- Decision taken.
+- Whether the existing plan was affected.
+
+**Page 10 — Plan History**
+
+- Initial plan.
+- Updated plan.
+- Previous values.
+- New values.
+- Which areas changed.
+- Which agents were called.
+- Timestamp of each update.
+
+## **5. Database design — PostgreSQL**
+
+The database should be designed before building the backend.
+
+Recommended tables:
+
+| Table                | Purpose                                   |
+| -------------------- | ----------------------------------------- |
+| `events`             | Main event details                        |
+| `messages`           | Original uploaded and additional messages |
+| `extracted_facts`    | Information extracted from messages       |
+| `constraints`        | Mandatory and optional event constraints  |
+| `decisions`          | Accepted and rejected decisions           |
+| `venues`             | Venue information                         |
+| `schedules`          | Event timetable                           |
+| `food_plans`         | Food quantities and prices                |
+| `judges`             | Judge information                         |
+| `judge_assignments`  | Team-to-judge assignments                 |
+| `budget_items`       | Expense records                           |
+| `plans`              | Generated plan versions                   |
+| `model_traces`       | Complete AI call records                  |
+| `validation_results` | Constraint validation outcomes            |
+
+**Important database rules:**
+
+- Never overwrite original messages.
+- Store the source message for every extracted fact.
+- Preserve previous plan versions.
+- Store model-reported token counts, not estimated token counts.
+- Keep accepted and rejected messages separately identifiable.
+- Maintain relationships between facts, decisions, messages and plan versions.
+
+## **6. Message processing and conflict detection**
+
+This is one of the most important scoring areas.
+
+The system must understand that a newer message is not automatically correct.
+
+For example:
+
+| Message                           | Expected decision                 | Reason                               |
+| --------------------------------- | --------------------------------- | ------------------------------------ |
+| Standard lunch Rs. 1,000          | Superseded                        | Newer price provided                 |
+| Standard lunch Rs. 1,200          | Accept                            | Updated price                        |
+| Basic lunch Rs. 800               | Accept as alternative             | Valid package                        |
+| DJ for Rs. 50,000                 | Do not automatically approve      | Request, not an approved requirement |
+| Judge arriving 10 minutes late    | Accept with scheduling adjustment | Operational update                   |
+| Caterer reducing 177 boxes to 100 | Reject                            | Insufficient food quantity           |
+
+### **Conflict detection rules**
+
+Implement the following checks:
+
+1. **Authority:** Who issued the message? Is that person authorized to change the requirement?
+2. **Recency:** Is the information newer than an existing fact?
+3. **Explicit approval:** Is this a confirmed decision or merely a suggestion?
+4. **Feasibility:** Does the new information satisfy existing constraints?
+5. **Capacity:** Does the venue accommodate everyone?
+6. **Budget:** Does the updated expenditure remain within Rs. 650,000?
+7. **Completeness:** Does the plan still cover all five required areas?
+8. **Consistency:** Does the new message contradict another accepted fact?
+
+For unseen messages, the system must not rely on specific sender names or hardcoded sample phrases. It should extract the intent and compare it against the existing constraints.
+
+A crucial distinction: an authorized correction can supersede an older fact, but an ordinary suggestion cannot silently override an approved requirement.
+
+## **7. Sample pack: expected planning results**
+
+Now let's calculate the sample pack properly. These figures should be produced by the system from the messages, not typed into the code.
+
+### **A. Venue selection**
+
+The sample message provides four venue options:
+
+| Venue  | Capacity | Cost        | Generator  |
+| ------ | -------- | ----------- | ---------- |
+| Room D | 80       | Rs. 40,000  | Not stated |
+| Hall A | 200      | Rs. 120,000 | Not stated |
+| Hall B | 200      | Rs. 150,000 | Yes        |
+| Hall C | 300      | Rs. 220,000 | Yes        |
+
+Recommended: Hall B
+
+Reason:
+
+- Accommodates 150 students, 10 staff and 20 judges.
+- Has a standby generator.
+- Costs Rs. 150,000.
+- Is cheaper than Hall C.
+
+Hall A is cheaper, but Hall B offers additional power resilience. The selection should be justified as a risk-based decision, not presented as the only feasible option.
+
+### **B. Food planning**
+
+The sample provides:
+
+| Package                | Price per person |
+| ---------------------- | ---------------- |
+| Old standard lunch     | Rs. 1,000        |
+| Updated standard lunch | Rs. 1,200        |
+| Basic lunch            | Rs. 800          |
+
+Delivery is free.
+
+The baseline attendance calculation is:
+
+\\[ 150+10+20=180\text{ people} \\]
+
+This assumes students, staff and all judges require food. The system should allow this assumption to be revised if a message specifies a different catering headcount.
+
+| Package  | Calculation | Total       |
+| -------- | ----------- | ----------- |
+| Standard | 180 × 1,200 | Rs. 216,000 |
+| Basic    | 180 × 800   | Rs. 144,000 |
+
+For the sample plan, select basic lunch to preserve the budget while maintaining sufficient quantities.
+
+**Important:** The practice message mentions 177 people to feed. That is a separate test scenario, not a reason to hardcode 177 into the baseline plan. For that scenario, 100 boxes must be rejected because they are insufficient.
+
+### **C. Judging calculations**
+
+Given:
+
+- 50 teams.
+- 20 confirmed judges.
+- 15 minutes per team.
+- Maximum three teams per judge.
+- Rs. 5,000 honorarium per judge.
+
+Minimum required judges:
+
+\\[ \left\lceil\frac{50}{3}\right\rceil=17 \\]
+
+Available capacity:
+
+\\[ 20\times3=60\text{ teams} \\]
+
+Honorarium:
+
+\\[ 20\times5,000=Rs.\ 100,000 \\]
+
+Judging capacity sufficient
+
+One judge may arrive 10 minutes late. The system should reassign their teams to other judges, subject to the three-team maximum, rather than automatically rejecting the judge's participation.
+
+### **D. Budget calculation**
+
+The sample already has these expenses ordered:
+
+| Expense                  | Amount          |
+| ------------------------ | --------------- |
+| Prizes                   | Rs. 100,000     |
+| Backup internet          | Rs. 20,000      |
+| Printing                 | Rs. 10,000      |
+| **Existing commitments** | **Rs. 130,000** |
+
+Recommended sample budget:
+
+| Expense             | Amount          |
+| ------------------- | --------------- |
+| Hall B              | Rs. 150,000     |
+| Basic lunch for 180 | Rs. 144,000     |
+| Judge honorarium    | Rs. 100,000     |
+| Prizes              | Rs. 100,000     |
+| Backup internet     | Rs. 20,000      |
+| Printing            | Rs. 10,000      |
+| **Total**           | **Rs. 524,000** |
+| **Approved budget** | **Rs. 650,000** |
+| **Remaining**       | **Rs. 126,000** |
+
+**Budget overview**
+
+# **Rs. 524,000**
+
+Projected expenditure
+
+Used: 80.62%
+
+**Remaining: 19.38%**
+
+Total budget
+
+**Rs. 650,000**
+
+Total expenses
+
+**Rs. 524,000**
+
+Remaining balance
+
+**Rs. 126,000**
+
+The DJ request of Rs. 50,000 should remain unapproved unless an authorized person approves it. If approved, the projected total would become Rs. 574,000, leaving Rs. 76,000.
+
+### **E. Schedule planning**
+
+The brief gives these fixed milestones:
+
+| Time         | Activity                   |
+| ------------ | -------------------------- |
+| 10:00 AM     | Build starts               |
+| 1:25 PM      | Code freeze and final push |
+| 1:30 PM      | Whole-room test run        |
+| 2:30–4:30 PM | Judges visit tables        |
+
+A 15-minute prayer break must also be included.
+
+**Important scheduling issue:** The brief calls this a four-hour hackathon, but the listed milestones span 10:00 AM to 4:30 PM. The system must not silently pretend these are the same duration. It should preserve the explicit milestones, flag the duration inconsistency, and request clarification at the help desk. Do not invent a new official event timetable.
+
+The judge's 10-minute delay should be handled through an operational contingency without changing the published judging window.&#x20;
+
+Hackathon_Students_Brief_Final.pdf
+
+Hackathon_Students_Brief_Final.pdf
+
+
+
+## **8. AI model calls and trace management**
+
+This is a major scoring requirement.
+
+The brief gives six possible area tags:
+
+- reading
+- venue
+- schedule
+- food
+- judging
+- budget
+
+Every model call must have exactly one appropriate area tag.
+
+Example trace structure:
+
+| Call | Model     | Area    | Purpose                       |
+| ---- | --------- | ------- | ----------------------------- |
+| 1    | Small LLM | reading | Extract message facts         |
+| 2    | Small LLM | venue   | Understand venue constraints  |
+| 3    | Small LLM | food    | Understand updated food offer |
+| 4    | Small LLM | judging | Interpret judge requirements  |
+
+These are illustrative calls, not actual measured token results. The implementation must record the real calls and their actual provider-reported token usage.
+
+### **Trace data structure**
+
+Every trace record should contain:
+
+```
+{
+  "call_number": 1,
+  "model_name": "actual-model-name",
+  "area": "reading",
+  "input": "Actual model input",
+  "output": "Actual model output",
+  "input_tokens": 0,
+  "output_tokens": 0,
+  "total_tokens": 0,
+  "duration_ms": 0
+}
+```
+
+At the end:
+
+```
+========== EXECUTION SUMMARY ==========
+
+Total model calls: Actual count
+Reading calls: Actual count
+Venue calls: Actual count
+Schedule calls: Actual count
+Food calls: Actual count
+Judging calls: Actual count
+Budget calls: Actual count
+
+Total input tokens: Actual count
+Total output tokens: Actual count
+Total tokens: Actual count
+=======================================
+```
+
+Never invent token counts or report estimates as actual usage.
+
+### **Token optimization strategy**
+
+- Use one message-reading call where possible.
+- Extract structured facts in a compact format.
+- Use Python for arithmetic.
+- Use Python for capacity checks.
+- Use Python for budget calculations.
+- Avoid calling the model for information already extracted.
+- Use targeted calls only for affected planning areas.
+- Cache previously extracted facts.
+
+The organizers award five points for token efficiency and an additional ten-point bonus for using only models from their small-model list, including eligible local models. The exact approved list must be confirmed with the organizers.&#x20;
+
+Hackathon_Students_Brief_Final.pdf
+
+
+
+## **9. One-command execution system**
+
+This requirement must be implemented carefully.
+
+The judges will provide an unseen message pack. Your team must run it using one command without manually selecting agents or providing flags.
+
+I recommend:
+
+```
+python run.py
+```
+
+The command should automatically:
+
+1. Read the configured message file.
+2. Preserve all original messages.
+3. Identify new messages.
+4. Extract facts.
+5. Identify conflicts.
+6. Generate or update the plan.
+7. Validate all five areas.
+8. Save the plan in PostgreSQL.
+9. Generate the complete execution trace.
+10. Export the final plan and trace.
+
+The same command should work for both initial execution and subsequent updates.
+
+### **Incremental update mechanism**
+
+Suppose Finance sends:
+
+> The printing bill came in at Rs. 15,000, not Rs. 10,000.
+
+The system should:
+
+- Identify the updated printing cost.
+- Check the source and whether it is an authorized correction.
+- Update the budget.
+- Recalculate total expenses and remaining balance.
+- Preserve the previous plan version.
+- Save the new plan.
+- Record the decision in the trace.
+
+New total:
+
+\\[ 524,000+5,000=529,000 \\]
+
+Remaining budget:
+
+\\[ 650,000-529,000=121,000 \\]
+
+Only the budget area should need a model call if the correction is already unambiguously understood and the system can handle the rest through Python.
+
+For a more complicated message, the system can call the reading agent and then only the affected planning modules.
+
+**Update limits:**
+
+- Maximum five model calls.
+- Maximum one minute.
+- Do not regenerate unaffected areas.
+- Revalidate the entire plan using Python rules after an update.
+
+The complete run must finish within two minutes.&#x20;
+
+Hackathon_Students_Brief_Final.pdf
+
+
+
+## **10. Project folder structure**
+
+I recommend the following structure for your GitHub repository:
+
+```
+mind-to-machine/
+│
+├── frontend/
+│   ├── src/
+│   │   ├── components/
+│   │   │   ├── Sidebar.tsx
+│   │   │   ├── Navbar.tsx
+│   │   │   ├── StatCard.tsx
+│   │   │   ├── BudgetChart.tsx
+│   │   │   ├── MessageTable.tsx
+│   │   │   └── TraceTable.tsx
+│   │   │
+│   │   ├── pages/
+│   │   │   ├── Dashboard.tsx
+│   │   │   ├── Messages.tsx
+│   │   │   ├── Venue.tsx
+│   │   │   ├── Schedule.tsx
+│   │   │   ├── Food.tsx
+│   │   │   ├── Judging.tsx
+│   │   │   ├── Budget.tsx
+│   │   │   ├── Trace.tsx
+│   │   │   ├── Validation.tsx
+│   │   │   └── History.tsx
+│   │   │
+│   │   ├── services/
+│   │   ├── hooks/
+│   │   ├── types/
+│   │   ├── App.tsx
+│   │   └── main.tsx
+│   │
+│   └── package.json
+│
+├── backend/
+│   ├── agents/
+│   │   ├── reading_agent.py
+│   │   ├── venue_agent.py
+│   │   ├── schedule_agent.py
+│   │   ├── food_agent.py
+│   │   ├── judging_agent.py
+│   │   └── budget_agent.py
+│   │
+│   ├── engine/
+│   │   ├── orchestrator.py
+│   │   ├── extraction.py
+│   │   ├── conflict_detector.py
+│   │   ├── validation_engine.py
+│   │   ├── dependency_engine.py
+│   │   └── update_engine.py
+│   │
+│   ├── database/
+│   │   ├── connection.py
+│   │   ├── models.py
+│   │   └── migrations/
+│   │
+│   ├── services/
+│   │   ├── model_service.py
+│   │   ├── message_service.py
+│   │   ├── planning_service.py
+│   │   └── export_service.py
+│   │
+│   ├── schemas/
+│   ├── api/
+│   ├── tests/
+│   └── main.py
+│
+├── data/
+│   └── messages.txt
+│
+├── outputs/
+│   ├── final_plan.json
+│   ├── execution_trace.json
+│   └── report.json
+│
+├── run.py
+├── requirements.txt
+├── .env.example
+├── .gitignore
+└── README.md
+```
+
+This is a proposed structure. You can simplify files if time is limited, but do not remove any required functionality.
+
+## **11. API endpoints**
+
+Your FastAPI backend should expose these endpoints:
+
+| Method | Endpoint               | Function                    |
+| ------ | ---------------------- | --------------------------- |
+| GET    | `/api/dashboard`       | Dashboard statistics        |
+| POST   | `/api/messages/upload` | Upload message file         |
+| GET    | `/api/messages`        | Retrieve messages           |
+| POST   | `/api/messages/add`    | Add a new message           |
+| POST   | `/api/run`             | Execute initial planning    |
+| POST   | `/api/update`          | Process new messages        |
+| GET    | `/api/plan/current`    | Retrieve current plan       |
+| GET    | `/api/plan/history`    | Retrieve previous plans     |
+| GET    | `/api/trace`           | Retrieve AI trace           |
+| GET    | `/api/validation`      | Retrieve validation results |
+| GET    | `/api/budget`          | Retrieve budget details     |
+| GET    | `/api/export`          | Export final results        |
+
+The dashboard should display the latest data from PostgreSQL rather than maintaining a separate frontend-only version of the plan.
+
+## **12. Testing strategy**
+
+Do not only test the sample messages. The unseen pack is what matters.
+
+Create test scenarios for the following:
+
+| Test | Scenario                           | Expected result                                  |
+| ---- | ---------------------------------- | ------------------------------------------------ |
+| 1    | Original eight messages            | Complete valid plan                              |
+| 2    | Updated printing cost              | Budget recalculated                              |
+| 3    | Only 100 food boxes for 177 people | Reject insufficient quantity                     |
+| 4    | Venue capacity too small           | Reject venue                                     |
+| 5    | Budget exceeds limit               | Reject or revise optional expenses               |
+| 6    | New judge arrives late             | Reassign teams                                   |
+| 7    | New venue quotation                | Reevaluate venue                                 |
+| 8    | New prayer break                   | Update schedule                                  |
+| 9    | Roman Urdu message                 | Extract correct information                      |
+| 10   | Old quotation repeated             | Prevent stale information overriding newer facts |
+| 11   | Unauthorized budget change         | Do not silently approve                          |
+| 12   | Multiple changes in one message    | Update all affected areas                        |
+
+Also test:
+
+- Missing model API key.
+- Model timeout.
+- Malformed model response.
+- Database connection failure.
+- Duplicate message.
+- Multiple messages arriving one at a time.
+- Model call limit during updates.
+- Full execution timeout.
+- Trace completeness.
+
+### **Six final validation checks**
+
+These are particularly important because they correspond to the output judging criteria:
+
+1. Correct figures.
+2. Within budget.
+3. Venue fits.
+4. Schedule valid.
+5. Enough judges.
+6. All five areas covered.
+
+Hackathon_Students_Brief_Final.pdf
+
+## **13. Development roadmap**
+
+I recommend implementing the project in this exact order.
+
+1. **Phase 1 — Project setup**
+   - Create GitHub repository.
+   - Set up React + Vite.
+   - Set up FastAPI.
+   - Install PostgreSQL.
+   - Connect backend to PostgreSQL.
+   - Configure environment variables.
+2. **Phase 2 — AI integration**
+   - Choose an eligible small model.
+   - Test API access.
+   - Test rate limits.
+   - Test response speed.
+   - Implement structured JSON extraction.
+   - Implement actual token tracking.
+3. **Phase 3 — Core planning engine**
+   - Build message reader.
+   - Build fact extraction.
+   - Build constraint storage.
+   - Build conflict detection.
+   - Build five planning modules.
+   - Build validation engine.
+4. **Phase 4 — Budget and scheduling**
+   - Implement all calculations in Python.
+   - Implement venue selection.
+   - Implement food calculations.
+   - Implement judge assignments.
+   - Implement schedule validation.
+   - Implement budget validation.
+5. **Phase 5 — Update engine**
+   - Implement message deduplication.
+   - Implement incremental updates.
+   - Implement dependency detection.
+   - Implement plan versioning.
+   - Enforce five-call and one-minute update limits.
+6. **Phase 6 — Dashboard**
+   - Build sidebar and overview.
+   - Build message management.
+   - Build all five planning pages.
+   - Build trace viewer.
+   - Build validation and rejection viewer.
+   - Build plan history.
+7. **Phase 7 — Integration and testing**
+   - Connect all frontend pages to FastAPI.
+   - Test original sample pack.
+   - Test unseen-style messages.
+   - Test Roman Urdu.
+   - Test wrong messages.
+   - Test update limits and timeouts.
+8. **Phase 8 — Final submission**
+   - Verify the single-command execution.
+   - Verify final plan and trace exports.
+   - Run the complete test.
+   - Push the final code.
+   - Record the commit hash.
+   - Make sure Git status is clean.
+
+## **14. Hackathon submission checklist**
+
+The brief states that code freeze is at 1:25 PM, and judges check your submitted commit hash against the repository. Therefore, reserve time for final verification and do not make any changes after the deadline.&#x20;
+
+Hackathon_Students_Brief_Final.pdf
+
+Hackathon_Students_Brief_Final.pdf
+
+
+
+**Final submission tracker**
+
+0/17 completed
+
+GitHub repository created and code pushed
+
+PostgreSQL connection tested
+
+Model access and small-model eligibility verified
+
+Original message pack processed successfully
+
+All five planning areas generated
+
+Six validation checks passing
+
+Wrong message correctly rejected with explanation
+
+Incremental update tested
+
+Update finishes within one minute and five calls
+
+Full run finishes within two minutes
+
+Actual token counts recorded
+
+Final plan saved
+
+Complete trace saved
+
+Dashboard working
+
+All three team members understand the architecture
+
+Final commit hash recorded
+
+Git status clean at code freeze
+
+## **15. Marks optimization strategy**
+
+| Judging component      | Points  | Our implementation                       |
+| ---------------------- | ------- | ---------------------------------------- |
+| Output                 | 30      | Accurate five-area plan                  |
+| Catching wrong message | 20      | Conflict and validation engine           |
+| Understanding          | 20      | Explainable architecture and trace       |
+| Handling change        | 10      | Incremental update engine                |
+| UI                     | 10      | Professional dashboard                   |
+| Predicting a change    | 5       | Predict affected areas before processing |
+| Token use              | 5       | Small model + Python calculations        |
+| **Total**              | **100** |                                          |
+
+The ten-point small-model bonus is additional to the 100 points, provided the plan passes every check.
+
+### **One extra feature I strongly recommend: Change Prediction**
+
+Before one of the three update messages arrives, you must write down which areas you expect to make model calls and give the prediction to the volunteer.
+
+Build a small prediction panel that displays:
+
+- Expected affected areas.
+- Reason for each predicted area.
+- Expected model calls.
+- Actual model calls after processing.
+- Whether the prediction was correct.
+
+This directly addresses the five-point prediction criterion.
+
+## **16. Final technology and implementation decision**
+
+# **Recommended final stack**
+
+Frontend
+
+**React + TypeScript**
+
+Backend
+
+**Python + FastAPI**
+
+Database
+
+PostgreSQL only
+
+AI
+
+**Small LLM**
+
+Calculations
+
+**Python rule engine**
+
+Styling
+
+**Tailwind CSS**
+
+Charts
+
+**Recharts**
+
+Execution
+
+**One Python command**
+
+**My final recommendation:** Prioritize the planning engine, conflict detection, accurate calculations, trace and incremental updates before spending time on dashboard animations or decorative UI. A beautiful dashboard cannot compensate for an incorrect plan or fabricated model traces.
+
+The next step should be to establish the project skeleton and PostgreSQL schema, then implement the complete backend before connecting the React dashboard. This gives you a reliable foundation for the unseen judging pack.
