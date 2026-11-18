@@ -13,12 +13,12 @@ Source: `plan for project.txt`. Check items off as completed.
 - [ ] Configure environment variables (`.env`, `.env.example`)
 
 ## Phase 2 — AI Integration
-- [ ] Choose an eligible small model
-- [ ] Test API access
+- [x] Choose an eligible small model (Groq `openai/gpt-oss-20b`, free tier)
+- [x] Test API access
 - [ ] Test rate limits
-- [ ] Test response speed
-- [ ] Implement structured JSON extraction
-- [ ] Implement actual token tracking (no estimates)
+- [x] Test response speed (~1.4s per call observed)
+- [x] Implement structured JSON extraction
+- [x] Implement actual token tracking (no estimates)
 
 ## Phase 3 — Core Planning Engine
 - [ ] Build message reader (reading_agent.py)
