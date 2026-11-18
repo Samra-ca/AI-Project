@@ -127,10 +127,11 @@ def create_model_service() -> ModelService:
     to be edited individually.
     """
     gemini_key = os.environ.get("GEMINI_API_KEY", "").strip()
-    if gemini_key and gemini_key.startswith("AIza"):
+    is_placeholder = gemini_key.lower().startswith("yahan_")
+    if gemini_key and not is_placeholder:
         return ModelService(
             api_key=gemini_key,
-            model_name=os.environ.get("GEMINI_MODEL_NAME", "gemini-2.0-flash"),
+            model_name=os.environ.get("GEMINI_MODEL_NAME", "gemini-3.8-flash"),
             provider="gemini",
         )
     return ModelService(
