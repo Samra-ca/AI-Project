@@ -145,3 +145,9 @@ def get_validation(db: Session = Depends(get_db)):
 @app.get("/api/budget")
 def get_budget(db: Session = Depends(get_db)):
     return _current_plan(db).data_json.get("budget", {})
+
+
+if __name__ == "__main__":
+    import uvicorn
+
+    uvicorn.run(app, host="127.0.0.1", port=8001)
