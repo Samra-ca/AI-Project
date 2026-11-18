@@ -39,3 +39,4 @@ venv/
 # Generated run outputs
 outputs/*.json
 data/incoming_messages.txt
+frontend/frontend_log.txt
