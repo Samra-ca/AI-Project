@@ -13,7 +13,7 @@ Source: `plan for project.txt`. Check items off as completed.
 - [ ] Configure environment variables (`.env`, `.env.example`)
 
 ## Phase 2 — AI Integration
-- [x] Choose an eligible small model (Groq `openai/gpt-oss-20b`, free tier)
+- [x] Choose an eligible small model (Groq `openai/gpt-oss-20b` as primary; switched to Gemini `gemini-3.8-flash` for the live demo after Groq's free-tier daily quota (200k tokens) proved too tight under repeated testing - both are supported, `create_model_service()` auto-picks Gemini whenever a real `GEMINI_API_KEY` is set, Groq otherwise)
 - [x] Test API access
 - [ ] Test rate limits
 - [x] Test response speed (~1.4s per call observed)
@@ -97,7 +97,7 @@ Known limitation: when a message gives a per-unit cost + separate quantity (e.g.
 - [x] Wrong message correctly rejected with explanation (DJ request, insufficient food boxes)
 - [x] Incremental update tested (printing correction → Rs. 529,000/Rs. 121,000, matches plan exactly)
 - [x] Update finishes within 1 minute and 5 model calls
-- [x] Full run finishes within 2 minutes
+- [ ] Full run finishes within 2 minutes - true on Groq (~25-40s observed); **on Gemini it took 2m37s** on an 11-message run, over the brief's 2-minute guideline. Team decision: prioritize Gemini's reliability over this limit for the live demo given Groq's quota was exhausted. If judges enforce the 2-minute limit strictly, switch back to Groq (remove/empty `GEMINI_API_KEY` in `.env`) once its quota has refilled.
 - [x] Actual (not estimated) token counts recorded
 - [x] Final plan saved
 - [x] Complete trace saved
