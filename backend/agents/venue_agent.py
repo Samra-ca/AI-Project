@@ -35,8 +35,21 @@ def _to_option(fact: dict) -> VenueOption | None:
     )
 
 
+def _latest_per_venue(venue_facts: list[dict]) -> list[VenueOption]:
+    """Facts are appended in chronological message order, so a later quote
+    for the same venue name (e.g. a price update) replaces an earlier one
+    rather than both being treated as separate options."""
+    by_name: dict[str, VenueOption] = {}
+    for fact in venue_facts:
+        option = _to_option(fact)
+        if option is None:
+            continue
+        by_name[option.name.lower().strip()] = option
+    return list(by_name.values())
+
+
 def select_venue(venue_facts: list[dict], required_capacity: int) -> VenueDecision:
-    options = [o for o in (_to_option(f) for f in venue_facts) if o is not None]
+    options = _latest_per_venue(venue_facts)
 
     feasible: list[VenueOption] = []
     rejected: list[tuple[VenueOption, str]] = []

@@ -38,8 +38,22 @@ def _to_package(fact: dict) -> FoodPackage | None:
     )
 
 
+def _latest_per_package(food_facts: list[dict]) -> list[FoodPackage]:
+    """Facts are appended in chronological message order, so a later quote
+    for the same package name (e.g. a price update) replaces an earlier one
+    instead of both being treated as separate options - a stale quote must
+    not win just because it happens to be cheaper."""
+    by_name: dict[str, FoodPackage] = {}
+    for fact in food_facts:
+        package = _to_package(fact)
+        if package is None:
+            continue
+        by_name[package.name.lower().strip()] = package
+    return list(by_name.values())
+
+
 def select_food_package(food_facts: list[dict], headcount: int) -> FoodDecision:
-    packages = [p for p in (_to_package(f) for f in food_facts) if p is not None]
+    packages = _latest_per_package(food_facts)
 
     if not packages:
         return FoodDecision(
