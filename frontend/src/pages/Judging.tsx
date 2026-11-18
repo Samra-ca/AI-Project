@@ -1,6 +1,9 @@
+import { Gavel } from 'lucide-react'
 import { useEffect, useState } from 'react'
-import { api } from '../services/api'
+import { Badge } from '../components/Badge'
+import { PageHeader } from '../components/PageHeader'
 import { StatCard } from '../components/StatCard'
+import { api } from '../services/api'
 
 interface JudgingData {
   teams: number
@@ -27,8 +30,8 @@ export function Judging() {
 
   return (
     <div>
-      <h1 className="mb-4 text-xl font-semibold text-white">Judging Management</h1>
-      {error && <p className="text-sm text-red-400">{error}</p>}
+      <PageHeader icon={Gavel} title="Judging Management" subtitle="Judges, capacity, and assignments" />
+      {error && <p className="mb-4 text-sm text-red-500">{error}</p>}
       {judging && (
         <>
           <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
@@ -40,15 +43,20 @@ export function Judging() {
               value={`Rs. ${judging.honorarium_total.toLocaleString()}`}
             />
           </div>
-          <p className="mt-4 text-sm text-slate-300">
-            Capacity for {judging.capacity_teams} teams ({judging.confirmed_judges} judges x{' '}
-            {judging.max_teams_per_judge} teams each) -{' '}
-            {judging.is_sufficient ? 'sufficient' : 'insufficient'} for {judging.teams} teams.
-          </p>
+          <div className="mt-4 flex items-center justify-between rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+            <p className="text-sm text-slate-700">
+              Capacity for {judging.capacity_teams} teams ({judging.confirmed_judges} judges x{' '}
+              {judging.max_teams_per_judge} teams each, {judging.minutes_per_team} min/team) for{' '}
+              {judging.teams} teams needed.
+            </p>
+            <Badge tone={judging.is_sufficient ? 'green' : 'red'}>
+              {judging.is_sufficient ? 'Sufficient' : 'Insufficient'}
+            </Badge>
+          </div>
           {judging.reassignment_notes.map((note, i) => (
             <p
               key={i}
-              className="mt-2 rounded-lg border border-amber-800 bg-amber-950/40 p-3 text-xs text-amber-300"
+              className="mt-3 rounded-xl border border-amber-200 bg-amber-50 p-3 text-xs text-amber-800"
             >
               {note}
             </p>

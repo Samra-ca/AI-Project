@@ -1,4 +1,7 @@
+import { UtensilsCrossed } from 'lucide-react'
 import { useEffect, useState } from 'react'
+import { Badge } from '../components/Badge'
+import { PageHeader } from '../components/PageHeader'
 import { api } from '../services/api'
 
 interface FoodPackage {
@@ -28,25 +31,35 @@ export function Food() {
 
   return (
     <div>
-      <h1 className="mb-4 text-xl font-semibold text-white">Food Planning</h1>
-      {error && <p className="text-sm text-red-400">{error}</p>}
+      <PageHeader icon={UtensilsCrossed} title="Food Planning" subtitle="Meals and refreshments for participants" />
+      {error && <p className="mb-4 text-sm text-red-500">{error}</p>}
+
       {food?.selected && (
-        <div className="mb-4 rounded-lg border border-blue-800 bg-blue-950/40 p-4">
-          <p className="text-sm font-medium text-white">
-            Selected: {food.selected.name} (Rs. {food.selected.price_per_person}/head x{' '}
-            {food.headcount} = Rs. {food.total_cost.toLocaleString()})
-          </p>
-          <p className="mt-1 text-xs text-slate-400">{food.reason}</p>
+        <div className="mb-4 rounded-xl border border-violet-200 bg-violet-50 p-4">
+          <div className="flex items-center justify-between">
+            <p className="text-sm font-semibold text-slate-900">
+              {food.selected.name} &middot; Rs. {food.selected.price_per_person}/head x{' '}
+              {food.headcount} = Rs. {food.total_cost.toLocaleString()}
+            </p>
+            <Badge tone="violet">Selected</Badge>
+          </div>
+          <p className="mt-1 text-xs text-slate-600">{food.reason}</p>
         </div>
       )}
-      <h2 className="mb-2 text-sm font-medium text-slate-300">Other Options</h2>
-      <ul className="space-y-1 text-sm text-slate-400">
+
+      <h2 className="mb-2 text-sm font-semibold text-slate-700">Other Options</h2>
+      <div className="grid gap-3 md:grid-cols-2">
         {food?.rejected.map(([pkg, reason]) => (
-          <li key={pkg.name}>
-            {pkg.name} (Rs. {pkg.price_per_person}/head) - {reason}
-          </li>
+          <div key={pkg.name} className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+            <div className="flex items-center justify-between">
+              <p className="text-sm font-medium text-slate-800">{pkg.name}</p>
+              <Badge tone="slate">Not selected</Badge>
+            </div>
+            <p className="mt-1 text-xs text-slate-500">Rs. {pkg.price_per_person}/head</p>
+            <p className="mt-1 text-xs text-slate-400">{reason}</p>
+          </div>
         ))}
-      </ul>
+      </div>
     </div>
   )
 }

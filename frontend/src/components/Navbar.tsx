@@ -1,10 +1,21 @@
+import { Bell, UserRound } from 'lucide-react'
+
 export function Navbar() {
   return (
-    <header className="flex items-center justify-between border-b border-slate-800 bg-slate-900 px-6 py-3">
-      <p className="text-sm text-slate-400">Mind to Machine Hackathon</p>
-      <span className="rounded-full bg-emerald-600/20 px-3 py-1 text-xs text-emerald-300">
-        System Ready
-      </span>
+    <header className="flex items-center justify-between border-b border-slate-200 bg-white px-6 py-3">
+      <p className="text-sm text-slate-500">Mind to Machine Hackathon &middot; System Ready</p>
+      <div className="flex items-center gap-3">
+        <button
+          type="button"
+          className="rounded-full p-2 text-slate-500 hover:bg-slate-100"
+          aria-label="Notifications"
+        >
+          <Bell size={18} />
+        </button>
+        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-violet-600 text-white">
+          <UserRound size={16} />
+        </div>
+      </div>
     </header>
   )
 }

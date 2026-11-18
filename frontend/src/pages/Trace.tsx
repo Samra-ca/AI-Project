@@ -1,4 +1,6 @@
+import { ListTree } from 'lucide-react'
 import { useEffect, useState } from 'react'
+import { PageHeader } from '../components/PageHeader'
 import { TraceTable } from '../components/TraceTable'
 import { api } from '../services/api'
 import type { ModelTraceEntry } from '../types'
@@ -18,11 +20,12 @@ export function Trace() {
 
   return (
     <div>
-      <h1 className="mb-4 text-xl font-semibold text-white">AI Agent Trace</h1>
-      {error && <p className="text-sm text-red-400">{error}</p>}
-      <p className="mb-4 text-sm text-slate-400">
-        {rows.length} model call(s), {totalTokens.toLocaleString()} total tokens
-      </p>
+      <PageHeader
+        icon={ListTree}
+        title="AI Agent Trace"
+        subtitle={`${rows.length} model call(s), ${totalTokens.toLocaleString()} total tokens`}
+      />
+      {error && <p className="mb-4 text-sm text-red-500">{error}</p>}
       <TraceTable rows={rows} />
     </div>
   )

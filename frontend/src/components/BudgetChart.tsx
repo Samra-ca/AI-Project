@@ -11,7 +11,7 @@ export function BudgetChart({ spent, approved }: BudgetChartProps) {
     { name: 'Spent', value: spent },
     { name: 'Remaining', value: remaining },
   ]
-  const colors = ['#3b82f6', '#1e293b']
+  const colors = ['#7c3aed', '#e2e8f0']
 
   return (
     <ResponsiveContainer width="100%" height={220}>

@@ -1,4 +1,7 @@
+import { History as HistoryIcon } from 'lucide-react'
 import { useEffect, useState } from 'react'
+import { Badge } from '../components/Badge'
+import { PageHeader } from '../components/PageHeader'
 import { api } from '../services/api'
 
 interface PlanVersion {
@@ -20,24 +23,17 @@ export function History() {
 
   return (
     <div>
-      <h1 className="mb-4 text-xl font-semibold text-white">Plan Versions</h1>
-      {error && <p className="text-sm text-red-400">{error}</p>}
-      <ul className="space-y-2">
+      <PageHeader icon={HistoryIcon} title="Plan History" subtitle="Every plan version generated so far" />
+      {error && <p className="mb-4 text-sm text-red-500">{error}</p>}
+      <div className="divide-y divide-slate-100 rounded-xl border border-slate-200 bg-white shadow-sm">
         {versions.map((v) => (
-          <li
-            key={v.versionNumber}
-            className="flex items-center justify-between rounded-lg border border-slate-800 bg-slate-900/60 p-3 text-sm"
-          >
-            <span className="text-slate-200">Version {v.versionNumber}</span>
+          <div key={v.versionNumber} className="flex items-center justify-between px-4 py-3 text-sm">
+            <span className="font-medium text-slate-800">Version {v.versionNumber}</span>
             <span className="text-slate-400">{new Date(v.createdAt).toLocaleString()}</span>
-            {v.isCurrent && (
-              <span className="rounded-full bg-blue-600/20 px-2 py-0.5 text-xs text-blue-300">
-                Current
-              </span>
-            )}
-          </li>
+            {v.isCurrent ? <Badge tone="violet">Current</Badge> : <Badge tone="slate">Archived</Badge>}
+          </div>
         ))}
-      </ul>
+      </div>
     </div>
   )
 }
