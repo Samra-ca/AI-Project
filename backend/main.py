@@ -1,17 +1,22 @@
+import os
 from collections.abc import Generator
 
-from fastapi import Depends, FastAPI, HTTPException
-from fastapi.middleware.cors import CORSMiddleware
-from sqlalchemy.orm import Session
+from dotenv import load_dotenv
 
-from database import models
-from database.connection import SessionLocal
+load_dotenv(os.path.join(os.path.dirname(__file__), "..", ".env"))
+
+from fastapi import Depends, FastAPI, HTTPException  # noqa: E402
+from fastapi.middleware.cors import CORSMiddleware  # noqa: E402
+from sqlalchemy.orm import Session  # noqa: E402
+
+from database import models  # noqa: E402
+from database.connection import SessionLocal  # noqa: E402
 
 app = FastAPI(title="Mind2Machine Planning Agent")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],
+    allow_origin_regex=r"http://localhost:\d+",
     allow_methods=["*"],
     allow_headers=["*"],
 )
