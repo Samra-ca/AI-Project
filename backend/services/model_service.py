@@ -1,14 +1,15 @@
 import json
+import os
 import time
 from dataclasses import dataclass
 from typing import Literal
-
-from groq import APIConnectionError, APITimeoutError, Groq, RateLimitError
 
 Area = Literal["reading", "venue", "schedule", "food", "judging", "budget"]
 
 MAX_RETRIES = 4
 RETRY_BACKOFF_SECONDS = 3
+
+GEMINI_BASE_URL = "https://generativelanguage.googleapis.com/v1beta/openai/"
 
 
 @dataclass
@@ -28,10 +29,28 @@ class TraceEntry:
 class ModelService:
     """Wraps the small-LLM provider call and records every call with its
     actual provider-reported token usage, matching the required trace format.
+    Supports Groq or Gemini (via Gemini's OpenAI-compatible endpoint) -
+    whichever provider is configured.
     """
 
-    def __init__(self, api_key: str, model_name: str) -> None:
-        self._client = Groq(api_key=api_key)
+    def __init__(self, api_key: str, model_name: str, provider: str = "groq") -> None:
+        self._provider = provider
+        if provider == "gemini":
+            from openai import (
+                APIConnectionError,
+                APITimeoutError,
+                OpenAI,
+                RateLimitError,
+            )
+
+            self._client = OpenAI(api_key=api_key, base_url=GEMINI_BASE_URL)
+            self._retry_exceptions = (RateLimitError, APITimeoutError, APIConnectionError)
+        else:
+            from groq import APIConnectionError, APITimeoutError, Groq, RateLimitError
+
+            self._client = Groq(api_key=api_key)
+            self._retry_exceptions = (RateLimitError, APITimeoutError, APIConnectionError)
+
         self._model_name = model_name
         self._trace: list[TraceEntry] = []
 
@@ -77,7 +96,7 @@ class ModelService:
                     response_format={"type": "json_object"},
                     temperature=0,
                 )
-            except (RateLimitError, APITimeoutError, APIConnectionError) as exc:
+            except self._retry_exceptions as exc:
                 last_error = exc
                 if attempt < MAX_RETRIES - 1:
                     time.sleep(RETRY_BACKOFF_SECONDS * (attempt + 1))
@@ -98,3 +117,24 @@ class ModelService:
             "total_output_tokens": sum(e.output_tokens for e in self._trace),
             "total_tokens": sum(e.total_tokens for e in self._trace),
         }
+
+
+def create_model_service() -> ModelService:
+    """Picks the provider automatically: prefers Gemini whenever a real
+    (non-placeholder) GEMINI_API_KEY is configured, otherwise falls back to
+    Groq. This is the single place that decides which provider is used, so
+    every call site (run.py, main.py, tests) stays in sync without needing
+    to be edited individually.
+    """
+    gemini_key = os.environ.get("GEMINI_API_KEY", "").strip()
+    if gemini_key and gemini_key.startswith("AIza"):
+        return ModelService(
+            api_key=gemini_key,
+            model_name=os.environ.get("GEMINI_MODEL_NAME", "gemini-2.0-flash"),
+            provider="gemini",
+        )
+    return ModelService(
+        api_key=os.environ["GROQ_API_KEY"],
+        model_name=os.environ.get("MODEL_NAME", "openai/gpt-oss-20b"),
+        provider="groq",
+    )

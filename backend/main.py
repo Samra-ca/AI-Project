@@ -17,7 +17,7 @@ from engine.orchestrator import run_plan  # noqa: E402
 from engine.update_engine import run_update  # noqa: E402
 from services.export_service import export_plan  # noqa: E402
 from services.message_service import read_message_file  # noqa: E402
-from services.model_service import ModelService  # noqa: E402
+from services.model_service import create_model_service  # noqa: E402
 from services.persistence_service import persist_plan  # noqa: E402
 
 app = FastAPI(title="Mind2Machine Planning Agent")
@@ -62,10 +62,7 @@ def _run_full_pipeline(db: Session) -> dict:
     stateless and correct at the cost of re-spending model calls on
     already-seen messages on every trigger.
     """
-    model = ModelService(
-        api_key=os.environ["GROQ_API_KEY"],
-        model_name=os.environ.get("MODEL_NAME", "openai/gpt-oss-20b"),
-    )
+    model = create_model_service()
 
     initial_messages = read_message_file(BASE_PACK_PATH)
     processed_messages = list(initial_messages)

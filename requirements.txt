@@ -6,4 +6,5 @@ alembic
 psycopg2-binary
 python-dotenv
 groq
+openai
 python-multipart
