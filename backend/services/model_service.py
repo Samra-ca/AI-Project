@@ -131,7 +131,7 @@ def create_model_service() -> ModelService:
     if gemini_key and not is_placeholder:
         return ModelService(
             api_key=gemini_key,
-            model_name=os.environ.get("GEMINI_MODEL_NAME", "gemini-3.8-flash"),
+            model_name=os.environ.get("GEMINI_MODEL_NAME", "gemini-flash-lite-latest"),
             provider="gemini",
         )
     return ModelService(
