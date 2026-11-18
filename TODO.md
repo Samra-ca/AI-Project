@@ -80,28 +80,37 @@ Note: could not get a persistent local dev server running in this sandboxed shel
 Known limitation: when a message gives a per-unit cost + separate quantity (e.g. "Rs 3,000 each" x 5), budget_agent currently records only the unit cost if that fact were ever accepted as a line item, not cost×quantity. Not yet hit by any real test message (the one example found was correctly held pending anyway), but worth fixing if an unseen message exercises it.
 
 ## Phase 8 — Final Submission
-- [ ] Verify single-command execution (`python run.py`) for initial run and updates
-- [ ] Verify final plan + trace export (JSON/CSV)
-- [ ] Run full end-to-end test (< 2 minutes)
-- [ ] Push final code
-- [ ] Record final commit hash
-- [ ] Confirm git status is clean at code freeze (1:25 PM)
+- [x] Verify single-command execution (`python run.py`) for initial run and updates — ran live 4 times total, consistent correct result each time (3 clean passes after fixing the bugs below)
+- [x] Verify final plan + trace export (JSON) — final_plan.json, execution_trace.json, report.json all written correctly; no CSV export built (plan allows JSON or CSV)
+- [x] Run full end-to-end test (< 2 minutes) — 25-40s per run, even with rate-limit retries
+- [x] Push final code — pushed through this point
+- [ ] Record final commit hash — do this right before your actual submission, not now (code will keep changing)
+- [ ] Confirm git status is clean at code freeze (1:25 PM) — do this right before submission
 
-## Final Submission Tracker (0/17)
-- [ ] GitHub repository created and code pushed
-- [ ] PostgreSQL connection tested
-- [ ] Model access and small-model eligibility verified
-- [ ] Original message pack processed successfully
-- [ ] All five planning areas generated
-- [ ] Six validation checks passing (correct figures, within budget, venue fits, schedule valid, enough judges, all five areas covered)
-- [ ] Wrong message correctly rejected with explanation
-- [ ] Incremental update tested
-- [ ] Update finishes within 1 minute and 5 model calls
-- [ ] Full run finishes within 2 minutes
-- [ ] Actual (not estimated) token counts recorded
-- [ ] Final plan saved
-- [ ] Complete trace saved
-- [ ] Dashboard working
-- [ ] All team members understand the architecture
-- [ ] Final commit hash recorded
-- [ ] Git status clean at code freeze
+## Final Submission Tracker (13/17)
+- [x] GitHub repository created and code pushed
+- [x] PostgreSQL connection tested
+- [x] Model access verified (Groq `openai/gpt-oss-20b`, free tier) — small-model *eligibility bonus* still needs organizers to confirm Groq/this model is on their approved list
+- [x] Original message pack processed successfully
+- [x] All five planning areas generated
+- [x] Six validation checks passing — verified consistently across 3 repeated live runs, not just once
+- [x] Wrong message correctly rejected with explanation (DJ request, insufficient food boxes)
+- [x] Incremental update tested (printing correction → Rs. 529,000/Rs. 121,000, matches plan exactly)
+- [x] Update finishes within 1 minute and 5 model calls
+- [x] Full run finishes within 2 minutes
+- [x] Actual (not estimated) token counts recorded
+- [x] Final plan saved
+- [x] Complete trace saved
+- [ ] Dashboard working — built and wired to real API, but not yet visually confirmed in an actual browser (see Phase 6 note)
+- [ ] All team members understand the architecture — only your team can confirm this
+- [ ] Final commit hash recorded — do at actual submission time
+- [ ] Git status clean at code freeze — do at actual submission time
+
+## Bugs found and fixed by running live repeatedly (not caught by a single run)
+These only showed up because the pipeline was re-run against the real API multiple times, since a small model's output isn't perfectly consistent run to run:
+1. Groq's free-tier rate limit (8000 TPM) crashed the whole run with an unhandled exception — fixed with retry/backoff in model_service.py.
+2. The model occasionally used a synonym key (`number_of_judges` instead of `judges_confirmed`), silently zeroing judge capacity — fixed with a key-alias fallback plus a stricter prompt.
+3. The model occasionally set `budget_all_in` to the expense amount itself on an ordinary line item (not just the real ceiling statement), which got excluded from spend by a truthy check — fixed with a strict `is True` check plus a clearer prompt explanation.
+4. `is_confirmed_decision` was never actually defined in the prompt, so a stated correction ("the bill came in at Rs 15,000") was sometimes misread as an unapproved request — fixed by defining the field explicitly.
+
+**Takeaway for your team**: this is a free small model, not a deterministic function - the same message can occasionally extract slightly differently between runs. The fixes above closed the specific failure modes found, but if you see a run produce a different number than expected, re-run it before assuming the number is wrong, and check `outputs/execution_trace.json` for what the model actually returned on that call.
