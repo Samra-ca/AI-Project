@@ -21,9 +21,9 @@ Source: `plan for project.txt`. Check items off as completed.
 - [x] Implement actual token tracking (no estimates)
 
 ## Phase 3 — Core Planning Engine
-- [ ] Build message reader (reading_agent.py)
-- [ ] Build fact extraction (extraction.py)
-- [ ] Build constraint storage (constraints table + models)
+- [x] Build message reader (message_service.py — parses sender/date/message blocks, preserves original text, fingerprints for dedup)
+- [x] Build fact extraction (reading_agent.py via ModelService)
+- [x] Build constraint storage (all 14 tables created in PostgreSQL: events, messages, extracted_facts, constraints, decisions, venues, schedules, food_plans, judges, judge_assignments, budget_items, plans, model_traces, validation_results)
 - [ ] Build conflict detection (conflict_detector.py) — authority, recency, approval, feasibility, capacity, budget, completeness, consistency
 - [ ] Build five planning modules (venue, schedule, food, judging, budget agents)
 - [ ] Build validation engine (validation_engine.py)
