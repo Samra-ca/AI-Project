@@ -37,8 +37,12 @@ not a request, as long as the sender states it rather than asking for it.
 The "attributes" object holds extra named values when they apply to this
 fact's area. You MUST use these exact key names verbatim - never rename,
 abbreviate, or invent a synonym for them:
-- venue: venue_name, capacity, has_generator
-- food: package_name, price_per_person, delivery_free, headcount
+- venue: venue_name, capacity, has_generator (always include venue_name
+  whenever a specific venue is named, even in a price update or correction
+  that doesn't re-describe the whole venue)
+- food: package_name, price_per_person, delivery_free, headcount (always
+  include package_name whenever a specific food package is named, even in
+  a price update or correction that doesn't re-describe the whole package)
 - judging: judges_confirmed, honorarium_per_judge, minutes_per_team,
   max_teams_per_judge, late_minutes
 - budget: category, budget_all_in (boolean true/false only - set it to
