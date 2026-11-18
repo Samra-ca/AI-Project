@@ -39,7 +39,10 @@ def is_budget_ceiling_statement(fact: dict, approved_budget: float) -> bool:
     if fact.get("area") != "budget":
         return False
     attrs = fact.get("attributes") or {}
-    if attrs.get("budget_all_in"):
+    # Strict `is True` on purpose: the model has been observed to set this
+    # key to a cost figure instead of a boolean on ordinary line items,
+    # which would wrongly exclude a real expense if checked for truthiness.
+    if attrs.get("budget_all_in") is True:
         return True
     cost = fact.get("cost")
     return cost is not None and float(cost) >= approved_budget

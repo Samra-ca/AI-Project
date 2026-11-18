@@ -20,20 +20,35 @@ Return a JSON object with exactly this shape:
       "date": "ISO date/time or null",
       "is_confirmed_decision": true or false,
       "confidence": number between 0 and 1,
-      "attributes": {
-        "any additional named attributes relevant to this fact, e.g.":
-        "venue_name, capacity, has_generator, package_name, price_per_person,
-         delivery_free, headcount, judges_confirmed, honorarium_per_judge,
-         minutes_per_team, max_teams_per_judge, late_minutes, category,
-         start_time, end_time - include only the ones that actually apply"
-      }
+      "attributes": { ... }
     }
   ],
   "sender_authority_hint": "short note on whether the sender sounds authorized to approve this change, or null if unclear"
 }
 
-Only extract what is actually stated. Do not invent values. Use null or omit
-an attribute key when a message doesn't mention it."""
+"is_confirmed_decision" means: does the sender state this as a settled fact
+or number, including a correction to an earlier figure ("the bill came in
+at Rs X", "it's now Rs Y", "confirmed: X")? Then true. Is it instead a
+request, suggestion, question, or something explicitly awaiting someone
+else's approval ("can we get X", "I'd like to request Y")? Then false. A
+correction or update to a previous number is still a confirmed decision,
+not a request, as long as the sender states it rather than asking for it.
+
+The "attributes" object holds extra named values when they apply to this
+fact's area. You MUST use these exact key names verbatim - never rename,
+abbreviate, or invent a synonym for them:
+- venue: venue_name, capacity, has_generator
+- food: package_name, price_per_person, delivery_free, headcount
+- judging: judges_confirmed, honorarium_per_judge, minutes_per_team,
+  max_teams_per_judge, late_minutes
+- budget: category, budget_all_in (boolean true/false only - set it to
+  true ONLY on the single fact that states the event's overall approved
+  budget ceiling, e.g. "the budget is Rs X, all in" - never on an
+  individual expense line item, even one that is itself "all inclusive")
+- schedule: prayer_break_minutes, duration_minutes, start_time, end_time
+
+Omit a key entirely (do not include it with null) when the message doesn't
+mention it. Only extract what is actually stated - do not invent values."""
 
 
 def extract_facts(model: ModelService, message_text: str, sender: str) -> dict:

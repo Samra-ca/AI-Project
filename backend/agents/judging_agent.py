@@ -19,11 +19,26 @@ class JudgingPlan:
     reassignment_notes: list[str] = field(default_factory=list)
 
 
+_KEY_ALIASES = {
+    "judges_confirmed": ("judges_confirmed", "number_of_judges", "confirmed_judges", "judge_count"),
+    "minutes_per_team": ("minutes_per_team", "time_per_team"),
+    "max_teams_per_judge": ("max_teams_per_judge", "teams_per_judge", "max_teams"),
+    "honorarium_per_judge": ("honorarium_per_judge", "honorarium", "per_judge_honorarium"),
+}
+
+
 def _first_attr(facts: list[dict], key: str):
+    """Looks up a key by its canonical name, falling back to known
+    synonyms the model has been observed to use instead - the model's key
+    naming isn't perfectly consistent across calls even with an explicit
+    schema, so this is a safety net on top of the prompt's exact-key-names
+    instruction."""
+    candidates = _KEY_ALIASES.get(key, (key,))
     for f in facts:
         attrs = f.get("attributes") or {}
-        if attrs.get(key) is not None:
-            return attrs[key]
+        for candidate in candidates:
+            if attrs.get(candidate) is not None:
+                return attrs[candidate]
     return None
 
 

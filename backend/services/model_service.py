@@ -3,9 +3,12 @@ import time
 from dataclasses import dataclass
 from typing import Literal
 
-from groq import Groq
+from groq import APIConnectionError, APITimeoutError, Groq, RateLimitError
 
 Area = Literal["reading", "venue", "schedule", "food", "judging", "budget"]
+
+MAX_RETRIES = 4
+RETRY_BACKOFF_SECONDS = 3
 
 
 @dataclass
@@ -36,15 +39,7 @@ class ModelService:
         self, area: Area, system_prompt: str, user_input: str, reason: str
     ) -> dict:
         start = time.perf_counter()
-        response = self._client.chat.completions.create(
-            model=self._model_name,
-            messages=[
-                {"role": "system", "content": system_prompt},
-                {"role": "user", "content": user_input},
-            ],
-            response_format={"type": "json_object"},
-            temperature=0,
-        )
+        response = self._call_with_retry(system_prompt, user_input)
         duration_ms = int((time.perf_counter() - start) * 1000)
 
         output_text = response.choices[0].message.content or "{}"
@@ -64,7 +59,29 @@ class ModelService:
                 reason=reason,
             )
         )
-        return json.loads(output_text)
+        try:
+            return json.loads(output_text)
+        except json.JSONDecodeError:
+            return {"facts": [], "parse_error": "Model response was not valid JSON."}
+
+    def _call_with_retry(self, system_prompt: str, user_input: str):
+        last_error: Exception | None = None
+        for attempt in range(MAX_RETRIES):
+            try:
+                return self._client.chat.completions.create(
+                    model=self._model_name,
+                    messages=[
+                        {"role": "system", "content": system_prompt},
+                        {"role": "user", "content": user_input},
+                    ],
+                    response_format={"type": "json_object"},
+                    temperature=0,
+                )
+            except (RateLimitError, APITimeoutError, APIConnectionError) as exc:
+                last_error = exc
+                if attempt < MAX_RETRIES - 1:
+                    time.sleep(RETRY_BACKOFF_SECONDS * (attempt + 1))
+        raise last_error  # noqa: B904
 
     @property
     def trace(self) -> list[TraceEntry]:
